@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
 using Dragons.Models.Dragons;
 using Dragons.Services.Dragons;
-using Dragons.WebApi.Models.Worlds;
+using Dragons.WebApi.Models.ApiV1.Worlds;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Salesforce.Common.Models.Json;
 
-namespace Dragons.WebApi.Controllers
+namespace Dragons.WebApi.Controllers.ApiV1
 {
-   
 
+    [ApiExplorerSettings(GroupName ="v1")]
     [Route("api/[controller]")]
     [ApiController]
     [Produces("application/json")]
@@ -18,7 +18,7 @@ namespace Dragons.WebApi.Controllers
         //constructor + dependency injections
         private IDragonService _dragonService;
         private IMapper _mapper;
-        public WorldsController(IDragonService dragonService,IMapper mapper)
+        public WorldsController(IDragonService dragonService, IMapper mapper)
         {
             _dragonService = dragonService;
             _mapper = mapper;
@@ -33,12 +33,12 @@ namespace Dragons.WebApi.Controllers
         /// <returns>A list of Worlds</returns>
         [HttpGet]
         [Route("")]
-        [ProducesResponseType(statusCode:StatusCodes.Status200OK,Type = typeof(WorldDto[]))]
+        [ProducesResponseType(statusCode: StatusCodes.Status200OK, Type = typeof(WorldDto[]))]
         public WorldDto[] GetWorldList([FromQuery] GetWorldListRequest request)
         {
-            var worlds = _dragonService.GetWorldList(request.Skip ?? 0, request.Take ?? 25,request.Search);
+            var worlds = _dragonService.GetWorldList(request.Skip ?? 0, request.Take ?? 25, request.Search);
             var worldDtos = _mapper.Map<WorldDto[]>(worlds);
-            
+
             return worldDtos;
         }
 
@@ -53,10 +53,10 @@ namespace Dragons.WebApi.Controllers
         [Route("{worldId:int}")]
         [ProducesResponseType(statusCode: StatusCodes.Status200OK, Type = typeof(WorldDto[]))]
         [ProducesResponseType(statusCode: StatusCodes.Status404NotFound)]
-        public IActionResult GetWorldById([FromRoute]int worldId)
+        public IActionResult GetWorldById([FromRoute] int worldId)
         {
             var world = _dragonService.GetWorld(worldId);
-            if(world == null)
+            if (world == null)
             {
                 return NotFound();
             }
@@ -74,7 +74,7 @@ namespace Dragons.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(statusCode: StatusCodes.Status201Created, Type = typeof(WorldDto[]))]
         [ProducesResponseType(statusCode: StatusCodes.Status422UnprocessableEntity)]
-        public IActionResult AddWorld([FromBody]AddWorldRequest request)
+        public IActionResult AddWorld([FromBody] AddWorldRequest request)
         {
             var worldEntity = _mapper.Map<World>(request);
 
@@ -82,7 +82,7 @@ namespace Dragons.WebApi.Controllers
             var world = _dragonService.GetWorld(id);
             var worldDto = _mapper.Map<WorldDto>(world);
 
-            return CreatedAtAction(nameof(GetWorldById), routeValues: new {worldId = id}, value:worldDto);
+            return CreatedAtAction(nameof(GetWorldById), routeValues: new { worldId = id }, value: worldDto);
         }
 
         //update world

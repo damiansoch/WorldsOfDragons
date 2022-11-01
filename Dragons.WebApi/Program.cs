@@ -67,7 +67,24 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc(name: "v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "Dragons API V1",
+        Title = "Worlds API V1",
+        Description = "An ASP.NET Core Web Api for info about Dragons",
+        TermsOfService = new Uri("https://example.com/terms"),
+        Contact = new OpenApiContact
+        {
+            Name = "Example Contact",
+            Url = new Uri("https://example.com/contact")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Example license",
+            Url = new Uri("https://example.com/licence")
+        }
+    });
+    options.SwaggerDoc(name: "v2", new OpenApiInfo
+    {
+        Version = "v2",
+        Title = "Wolrds and Dragons API V2",
         Description = "An ASP.NET Core Web Api for info about Dragons",
         TermsOfService = new Uri("https://example.com/terms"),
         Contact = new OpenApiContact
@@ -102,7 +119,11 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint($"/swagger/v1/swagger.json", "Worlds API V1");
+        c.SwaggerEndpoint($"/swagger/v2/swagger.json", "Wolrds and Dragons API V2");
+    });
 }
 else
 {

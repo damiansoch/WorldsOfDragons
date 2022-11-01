@@ -1,4 +1,4 @@
-﻿namespace Dragons.WebApi.Models.Worlds
+﻿namespace Dragons.WebApi.Models.ApiV1.Worlds
 {
     public class AddWorldRequest
     {

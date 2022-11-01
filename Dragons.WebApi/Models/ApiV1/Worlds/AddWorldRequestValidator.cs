@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Dragons.WebApi.Models.Worlds
+namespace Dragons.WebApi.Models.ApiV1.Worlds
 {
     //validator class for AddWorldRequest
     public class AddWorldRequestValidator:AbstractValidator<AddWorldRequest>
