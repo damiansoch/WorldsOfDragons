@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Dragons.Models.Dragons;
 using Dragons.Services.Dragons;
+using Dragons.WebApi.Attributes;
 using Dragons.WebApi.Models.ApiV2.Worlds;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,8 @@ namespace Dragons.WebApi.Controllers.ApiV2
     [Route("apiv2/[controller]")]
     [ApiController]
     [Produces("application/json")]
+    [BasicAuthorization]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public class WorldsController : ControllerBase
     {
         //constructor + dependency injections

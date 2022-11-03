@@ -92,12 +92,16 @@ namespace Dragons.Services.Dragons
             dragonToUpdate.Description = dragon.Description;
 
         }
-        public Dragon[] GetDragonsinWorldList(int worldId, int skip, int take)
+        public Dragon[] GetDragonsinWorldList(int worldId, int skip, int take,string search)
         {
             var world = GetWorld(worldId);
-            return world.Dragons.OrderBy(o=>o.Id).Skip(skip).Take(take).ToArray();
+            return world.Dragons.OrderBy(o=>o.Id)
+                .Where(o => string.IsNullOrWhiteSpace(search)
+                || (o.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
+                ))
+                .Skip(skip).Take(take).ToArray();
         }
-        public void SetDragonImage(int worldId, int dragonId, byte[] image, string fileName)
+        public void SetDragonImage(int worldId, int dragonId, byte[]? image, string? fileName)
         {
             var dragon = GetDragonInWorld(worldId, dragonId);
             dragon.DragonImageFile = image;

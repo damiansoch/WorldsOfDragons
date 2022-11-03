@@ -1,5 +1,8 @@
 using Dragons.Services.Dragons;
+using Dragons.WebApi.Handlers;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -10,6 +13,17 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddAuthentication()
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(
+    "BasicAuthentication", options => { });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("BasicAuthentication",
+        new AuthorizationPolicyBuilder("BasicAuthentication")
+        .RequireAuthenticatedUser().Build());
+});
+
 
 builder.Services.AddControllers(options =>
 {
@@ -98,8 +112,30 @@ builder.Services.AddSwaggerGen(options =>
             Url = new Uri("https://example.com/licence")
         }
     });
+    options.AddSecurityDefinition("basic", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "basic",
+        In = ParameterLocation.Header,
+        Description = "Basic Authorization header using the Bearer scheme"
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "basic"
+                }
+            },
+            new string[] { }
+        }
+    });
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,xmlFilename));
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
 builder.Services.AddScoped<IDragonService, DragonService>();

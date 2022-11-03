@@ -25,7 +25,7 @@ namespace Dragons.Services.Dragons
         void DeleteDragonFromWorld(int worldId,int dragonId);
         Dragon? GetDragonInWorld(int worldId, int dragonId);
         void UpdateDragonInWorld(int worldId,Dragon dragon);
-        Dragon[] GetDragonsinWorldList(int worldId, int skip, int take);
-        void SetDragonImage(int worldId,int dragonId,byte[] image,string fileName);
+        Dragon[] GetDragonsinWorldList(int worldId, int skip, int take,string search);
+        void SetDragonImage(int worldId,int dragonId,byte[]? image,string? fileName);
     }
 }
