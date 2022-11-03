@@ -11,17 +11,17 @@ namespace Dragons.WebApi.Controllers.ApiV2
 {
 
     [ApiExplorerSettings(GroupName = "v2")]
-    [Route("apiv2/[controller]")]
+    [Route("apiv2/Worlds")]
     [ApiController]
     [Produces("application/json")]
     [BasicAuthorization]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public class WorldsController : ControllerBase
+    public class WorldsControllerV2 : ControllerBase
     {
         //constructor + dependency injections
         private IDragonService _dragonService;
         private IMapper _mapper;
-        public WorldsController(IDragonService dragonService, IMapper mapper)
+        public WorldsControllerV2(IDragonService dragonService, IMapper mapper)
         {
             _dragonService = dragonService;
             _mapper = mapper;

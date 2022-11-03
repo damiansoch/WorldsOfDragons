@@ -9,7 +9,7 @@ namespace Dragons.Integrations.WorldsAndDragonsApiV2
     public interface IWorldsAndDragonsApiClient
     {
         //world
-        Task<World[]> GetWorlds(int? skip = null, int? take = null, CancellationToken? cancellationToken = null);
+        Task<World[]> GetWorlds(int? skip = null, int? take = null ,string? search = null, CancellationToken? cancellationToken = null);
         Task<World> GetWorld(int worldId, CancellationToken? cancellationToken = null);
         Task<AddWorldResponce> AddWorld(AddWorldRequest request, CancellationToken? cancellationToken = null);
         Task UpdateWorld(int worldId, UpdateWorldRequest request, CancellationToken? cancellationToken = null);
