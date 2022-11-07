@@ -246,5 +246,32 @@ namespace Dragons.Integrations.Tests.WorldsAndDragonsApiV2
             }).Should().ThrowAsync<AuthorizationException>();
         }
         #endregion
+
+        #region DeleteImage
+
+        [TestMethod]
+        public async Task DeleteDragonImage()
+        {
+            await apiClient.DeleteDragonImage(0, 1);
+        }
+        [TestMethod]
+        public async Task DeleteDragonImage_WorldAndDragonDoesntExist()
+        {
+            await new Func<Task>(async () =>
+            {
+                await apiClient.DeleteDragonImage(1000, 1000);
+            }).Should().ThrowAsync<WorldOrDragonNotFoundException>();
+        }
+        [TestMethod]
+        public async Task DeleteDragonImage_BadCredentials()
+        {
+            apiClient = new WorldsAndDragonsApiClient("badUsername", "BadPassword");
+
+            await new Func<Task>(async () =>
+            {
+                await apiClient.DeleteDragonImage(0, 1);
+            }).Should().ThrowAsync<AuthorizationException>();
+        }
+        #endregion
     }
 }

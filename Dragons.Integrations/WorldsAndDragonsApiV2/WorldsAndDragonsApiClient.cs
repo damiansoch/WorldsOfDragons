@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -127,7 +128,7 @@ namespace Dragons.Integrations.WorldsAndDragonsApiV2
         {
             try
             {
-                using (var httpClient =  CreateHttpClient())
+                using (var httpClient = CreateHttpClient())
                 {
                     var requestJson = JsonSerializer.Serialize(request);
 
@@ -152,9 +153,9 @@ namespace Dragons.Integrations.WorldsAndDragonsApiV2
                             {
                                 throw new AuthorizationException("Bad credentials");
                             }
-                            if(responseMessage.StatusCode == HttpStatusCode.UnprocessableEntity)
+                            if (responseMessage.StatusCode == HttpStatusCode.UnprocessableEntity)
                             {
-                                var responseBody = await responseMessage.Content.ReadAsStringAsync(cancellationToken?? CancellationToken.None);
+                                var responseBody = await responseMessage.Content.ReadAsStringAsync(cancellationToken ?? CancellationToken.None);
                                 var response = JsonSerializer.Deserialize<AddWorld422Responses>(responseBody, new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
                                 var errors = new List<string>();
@@ -187,29 +188,29 @@ namespace Dragons.Integrations.WorldsAndDragonsApiV2
         {
             try
             {
-                using(var httpClient = CreateHttpClient())
+                using (var httpClient = CreateHttpClient())
                 {
-                    var requestJson=JsonSerializer.Serialize(request);
+                    var requestJson = JsonSerializer.Serialize(request);
                     using (var httpContent = new StringContent(requestJson))
                     {
                         httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                         var url = $"worlds/{worldId}";
                         using (var responseMessage = await httpClient.PutAsync(url, httpContent, cancellationToken ?? CancellationToken.None))
                         {
-                            if(responseMessage.StatusCode == HttpStatusCode.NoContent)
+                            if (responseMessage.StatusCode == HttpStatusCode.NoContent)
                             {
                                 return;
                             }
-                            if(responseMessage.StatusCode == HttpStatusCode.Unauthorized)
+                            if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
                             {
                                 throw new AuthorizationException("Bad credentials");
                             }
-                            if(responseMessage.StatusCode == HttpStatusCode.NotFound)
+                            if (responseMessage.StatusCode == HttpStatusCode.NotFound)
                             {
                                 throw new WorldOrDragonNotFoundException($"World {worldId} not found");
                             }
                             throw new ApiException($"Unexpected status code exception {responseMessage.StatusCode}");
-                        } ;
+                        };
                     }
                 }
             }
@@ -217,7 +218,7 @@ namespace Dragons.Integrations.WorldsAndDragonsApiV2
             {
                 throw;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new ApiException("Unexpected http eceprion occurer", e);
             }
@@ -232,17 +233,17 @@ namespace Dragons.Integrations.WorldsAndDragonsApiV2
                 using (var httpClient = CreateHttpClient())
                 {
                     var url = $"worlds/{worldId}";
-                    using(var responseMessage = await httpClient.DeleteAsync(url, cancellationToken ?? CancellationToken.None))
+                    using (var responseMessage = await httpClient.DeleteAsync(url, cancellationToken ?? CancellationToken.None))
                     {
-                        if(responseMessage.StatusCode == HttpStatusCode.NoContent)
+                        if (responseMessage.StatusCode == HttpStatusCode.NoContent)
                         {
                             return;
                         }
-                        if(responseMessage.StatusCode == HttpStatusCode.Unauthorized)
+                        if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
                         {
                             throw new AuthorizationException("Bad credentials");
                         }
-                        if(responseMessage.StatusCode == HttpStatusCode.NotFound)
+                        if (responseMessage.StatusCode == HttpStatusCode.NotFound)
                         {
                             throw new WorldOrDragonNotFoundException($"World {worldId} not found");
                         }
@@ -271,25 +272,25 @@ namespace Dragons.Integrations.WorldsAndDragonsApiV2
                     using (var httpContent = new MultipartFormDataContent(
                         "Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture)))
                     {
-                        if(image != null && filename != null)
+                        if (image != null && filename != null)
                         {
                             httpContent.Add(new StreamContent(new MemoryStream(image)), "file", filename);
                         }
 
-                        
+
                         //do not specify media type
                         var url = $"worlds/{worldId}/dragon/{dragonId}/indentificationimage";
-                        using (var responceMessage = await httpClient.PutAsync(url, httpContent, cancellationToken?? CancellationToken.None))
+                        using (var responceMessage = await httpClient.PutAsync(url, httpContent, cancellationToken ?? CancellationToken.None))
                         {
                             if (responceMessage.StatusCode == HttpStatusCode.NoContent)
                             {
                                 return;
                             }
-                            if(responceMessage.StatusCode == HttpStatusCode.Unauthorized)
+                            if (responceMessage.StatusCode == HttpStatusCode.Unauthorized)
                             {
                                 throw new AuthorizationException("Bad credentials");
                             }
-                            if(responceMessage.StatusCode == HttpStatusCode.NotFound)
+                            if (responceMessage.StatusCode == HttpStatusCode.NotFound)
                             {
                                 throw new WorldOrDragonNotFoundException($"World {worldId} not found");
                             }
@@ -302,7 +303,7 @@ namespace Dragons.Integrations.WorldsAndDragonsApiV2
             {
                 throw;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new ApiException($"Unexpected exception,{e}");
             }
@@ -312,7 +313,37 @@ namespace Dragons.Integrations.WorldsAndDragonsApiV2
         #region DeleteDragonImage
         public async Task DeleteDragonImage(int worldId, int dragonId, CancellationToken? cancellationToken = null)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using(var httpClient = new HttpClient())
+                {
+                    var url = $"worlds/{worldId}/dragon/{dragonId}/indentificationimage";
+                    using (var responceMessage = await httpClient.DeleteAsync(url, cancellationToken ?? CancellationToken.None))
+                    {
+                        if(responceMessage.StatusCode == HttpStatusCode.NoContent)
+                        {
+                            return;
+                        }
+                        if(responceMessage.StatusCode == HttpStatusCode.Unauthorized)
+                        {
+                            throw new AuthorizationException("Bad credentials");
+                        }
+                        if(responceMessage.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            throw new WorldOrDragonNotFoundException($"World Id {worldId} or dragon Id {dragonId} not found");
+                        }
+                        throw new ApiException($"Unexpected Http exception staus code: {responceMessage.StatusCode}");
+                    }
+                }
+            }
+            catch (ApiException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                throw new ApiException("Unexpected exception" + e);
+            }
         }
         #endregion
     }
